@@ -35,9 +35,11 @@ export async function POST(req: Request) {
 
     const { titles, authors } = await ocrFromImage(bytes, file.type || 'image/jpeg')
 
-    // Post-cleaning
-    const cleanedTitles = Array.from(new Set(titles.map(t => t.replace(/\s+/g, ' ').trim()))).slice(0, 50)
-    const cleanedAuthors = Array.from(new Set(authors.map(a => a.replace(/\s+/g, ' ').trim()))).slice(0, 50)
+    // Post-cleaning with safe typing for Vercel TS build
+    const tArr: string[] = Array.isArray(titles) ? (titles as unknown[]).map(v => String(v ?? '')) : []
+    const aArr: string[] = Array.isArray(authors) ? (authors as unknown[]).map(v => String(v ?? '')) : []
+    const cleanedTitles = Array.from(new Set(tArr.map((t: string) => t.replace(/\s+/g, ' ').trim()))).slice(0, 50)
+    const cleanedAuthors = Array.from(new Set(aArr.map((a: string) => a.replace(/\s+/g, ' ').trim()))).slice(0, 50)
 
     return NextResponse.json({ titles: cleanedTitles, authors: cleanedAuthors })
   } catch (e: any) {
