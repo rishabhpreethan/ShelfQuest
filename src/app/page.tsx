@@ -1,14 +1,17 @@
 "use client"
 
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Upload from '@/components/Upload'
 import Preferences from '@/components/Preferences'
 import Results from '@/components/Results'
 import { loadPrefs, savePrefs } from '@/lib/storage'
 import Stepper from '@/components/Stepper'
 import { CameraIcon, ChevronRightIcon, BookOpenIcon, AdjustmentsHorizontalIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import Link from 'next/link'
 
 export default function HomePage() {
+  const params = useSearchParams()
   const [extracted, setExtracted] = useState<{ titles: string[], authors: string[] }>({ titles: [], authors: [] })
   const [prefs, setPrefs] = useState(loadPrefs())
   const [results, setResults] = useState<any>(null)
@@ -19,6 +22,17 @@ export default function HomePage() {
   useEffect(() => {
     savePrefs(prefs)
   }, [prefs])
+
+  useEffect(() => {
+    const s = params.get('start')
+    const stepParam = params.get('step')
+    if (s === '1') {
+      setShowWizard(true)
+      if (stepParam === '2') setStep(2)
+      else if (stepParam === '3') setStep(3)
+      else setStep(1)
+    }
+  }, [params])
 
   const canRecommend = useMemo(() => extracted.titles.length > 0, [extracted])
 
@@ -55,9 +69,9 @@ export default function HomePage() {
           <div className="space-y-3">
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">AI bookshelf scanner and book recommender</h2>
             <p className="text-neutral-600 dark:text-neutral-300 max-w-2xl">Find the perfect book for you. Upload a photo of your shelf, set your preferences, and get tailored picks with reasons and links.</p>
-            <button id="start" className="btn inline-flex items-center gap-2" onClick={() => { setShowWizard(true); setStep(1) }}>
+            <Link id="start" href="/scan" className="btn inline-flex items-center gap-2">
               <CameraIcon className="h-5 w-5" /> Start Scanning
-            </button>
+            </Link>
           </div>
 
           <div className="card flex items-start gap-4">
