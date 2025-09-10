@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+.border { border-color: rgba(0,0,0,0.15); }
+
+/* Redefine for simpler rounded style */
+.rounded-pixel { border-radius: 0.5rem; }
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-pixel border bg-brand-600 text-white disabled:opacity-50 hover:bg-brand-700 transition-colors;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-pixel border bg-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors;
+  }
+  .card {
+    @apply p-4 border rounded-pixel bg-white dark:bg-neutral-900 shadow-sm;
+  }
+  .link {
+    @apply inline-block text-brand-700 underline hover:opacity-80;
+  }
+}
+
+/* Transitions */
+@keyframes fade-slide {
+  0% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-slide { animation: fade-slide 220ms ease-out; }
