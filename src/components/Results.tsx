@@ -6,6 +6,10 @@ export default function Results({ data, loading }: { data: any, loading?: boolea
 
   const books = data?.metadata?.books || []
   const rec = data?.rec || null
+  const byId = new Map<string, any>(books.map((b: any) => [b.id, b]))
+  const ordered = Array.isArray(rec?.order)
+    ? rec.order.map((id: string) => byId.get(id)).filter(Boolean)
+    : []
 
   return (
     <div className="space-y-4">
@@ -32,12 +36,16 @@ export default function Results({ data, loading }: { data: any, loading?: boolea
         </div>
       )}
 
-      {!loading && (
+      {!loading && ordered.length > 0 && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {books.map((b: any) => (
+          {ordered.map((b: any) => (
             <BookCard key={b.id} book={b} reason={rec?.reasons?.[b.id]} />
           ))}
         </div>
+      )}
+
+      {!loading && rec && ordered.length === 0 && (
+        <div className="text-sm opacity-75">No strong matches based on your preferences. Try selecting more genres or different authors.</div>
       )}
     </div>
   )

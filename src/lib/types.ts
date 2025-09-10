@@ -15,4 +15,5 @@ export type BookMetadata = {
   summary?: string
   rating?: number
   amazonAffiliate?: string
+  genres?: string[]
 }

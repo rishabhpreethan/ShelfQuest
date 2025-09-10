@@ -22,6 +22,8 @@ export async function searchGoogleBooksByTitle(title: string): Promise<BookMetad
     previewLink: v.previewLink,
     isbn13,
     summary: v.description,
+    rating: typeof v.averageRating === 'number' ? v.averageRating : undefined,
     amazonAffiliate,
+    genres: Array.isArray(v.categories) ? v.categories : undefined,
   }
 }
