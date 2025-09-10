@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Upload from '@/components/Upload'
 import Preferences from '@/components/Preferences'
@@ -11,7 +11,6 @@ import { CameraIcon, ChevronRightIcon, BookOpenIcon, AdjustmentsHorizontalIcon, 
 import Link from 'next/link'
 
 export default function HomePage() {
-  const params = useSearchParams()
   const [extracted, setExtracted] = useState<{ titles: string[], authors: string[] }>({ titles: [], authors: [] })
   const [prefs, setPrefs] = useState(loadPrefs())
   const [results, setResults] = useState<any>(null)
@@ -23,16 +22,13 @@ export default function HomePage() {
     savePrefs(prefs)
   }, [prefs])
 
-  useEffect(() => {
-    const s = params.get('start')
-    const stepParam = params.get('step')
-    if (s === '1') {
-      setShowWizard(true)
-      if (stepParam === '2') setStep(2)
-      else if (stepParam === '3') setStep(3)
-      else setStep(1)
-    }
-  }, [params])
+  // Bootstrap wizard state from URL via Suspense child (satisfies Next.js build constraints)
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  const Bootstrap = () => (
+    <Suspense fallback={null}>
+      <QueryBootstrap onStart={(s: 1 | 2 | 3) => { setShowWizard(true); setStep(s) }} />
+    </Suspense>
+  )
 
   const canRecommend = useMemo(() => extracted.titles.length > 0, [extracted])
 
@@ -64,6 +60,7 @@ export default function HomePage() {
 
   return (
     <main className="space-y-10">
+      <Bootstrap />
       {!showWizard && (
         <section id="home" className="space-y-8 animate-fade-slide">
           <div className="space-y-3">
@@ -153,4 +150,18 @@ export default function HomePage() {
       )}
     </main>
   )
+}
+
+function QueryBootstrap({ onStart }: { onStart: (s: 1 | 2 | 3) => void }) {
+  const params = useSearchParams()
+  useEffect(() => {
+    const s = params.get('start')
+    const stepParam = params.get('step')
+    if (s === '1') {
+      if (stepParam === '2') onStart(2)
+      else if (stepParam === '3') onStart(3)
+      else onStart(1)
+    }
+  }, [params, onStart])
+  return null
 }

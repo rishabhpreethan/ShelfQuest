@@ -17,6 +17,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  // Prevent page scroll on mobile when sidebar is open
+  useEffect(() => {
+    const body = document.body
+    if (sidebarOpen) body.classList.add('overflow-hidden')
+    else body.classList.remove('overflow-hidden')
+    return () => body.classList.remove('overflow-hidden')
+  }, [sidebarOpen])
+
   return (
     <div className="relative">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
@@ -35,20 +43,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Link href="/" className="flex items-center gap-2">
                 {/* Ensure the logo file exists at public/shelfquestlogo.png */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/shelfquestlogo.png" alt="ShelfQuest" className="h-12 w-auto dark:invert" />
+                <img src="/shelfquestlogo.png" alt="ShelfQuest" className="h-12 sm:h-12 w-auto dark:invert" />
                 <span className="text-xl sm:text-2xl font-bold tracking-tight">ShelfQuest</span>
               </Link>
             </div>
             <div className="flex items-center gap-2">
-              <a href="#donate" className="btn-secondary inline-flex items-center gap-2 px-3 py-2"><HeartIcon className="h-5 w-5" /> Donate</a>
-              <a href="#contact" className="btn-secondary inline-flex items-center gap-2 px-3 py-2"><EnvelopeIcon className="h-5 w-5" /> Contact</a>
+              <a href="#donate" className="hidden sm:inline-flex btn-secondary items-center gap-2 px-3 py-2"><HeartIcon className="h-5 w-5" /> Donate</a>
+              <a href="#contact" className="hidden sm:inline-flex btn-secondary items-center gap-2 px-3 py-2"><EnvelopeIcon className="h-5 w-5" /> Contact</a>
               <ThemeToggle />
             </div>
           </header>
           {children}
-          <footer className="mt-10 text-xs opacity-60">
-            Built with Next.js, Tailwind, and Gemini.
-          </footer>
+
         </div>
       </div>
     </div>
